@@ -1,0 +1,50 @@
+# ─────────────────────────────────────────────────────────
+# Funding configuration for suppa-agent
+# ─────────────────────────────────────────────────────────
+# This file enables the "💜 Sponsor" button at the top of
+# the repository. GitHub reads it on every push to the
+# default branch.
+#
+# DOCS: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+#
+# HOW TO USE:
+#   1. Replace the placeholders below with your real handles.
+#   2. Delete (or comment out) the platforms you don't want.
+#   3. Commit and push to the default branch.
+#   4. Wait ~30 seconds, refresh the repo, and you'll see
+#      the Sponsor button appear.
+#
+# HOW MANY ENTRIES PER PLATFORM:
+#   - github: up to 4 usernames (array form: [user1, user2])
+#   - custom: up to 4 URLs (array form, must wrap URLs in quotes)
+#   - all others: exactly 1 username/handle
+# ─────────────────────────────────────────────────────────
+
+# GitHub Sponsors (recommended primary — 0% fees, native experience).
+# Requires application approval. Replace with your GitHub username
+# once your Sponsors profile is live. Until approved, leave this
+# line commented and the button will still show via Ko-fi/custom.
+# github: YOUR_GITHUB_USERNAME
+
+# Ko-fi (recommended secondary — fast setup, 0% on basic tier).
+# Sign up at ko-fi.com and put your handle here (the bit after ko-fi.com/).
+# ko_fi: YOUR_KOFI_HANDLE
+
+# Buy Me a Coffee (alternative to Ko-fi, similar concept).
+# buy_me_a_coffee: YOUR_BMC_HANDLE
+
+# Liberapay (European non-profit, 0% fees beyond their own).
+# liberapay: YOUR_LIBERAPAY_HANDLE
+
+# Patreon (recurring memberships — 5%+ fee, more setup).
+# patreon: YOUR_PATREON_HANDLE
+
+# Open Collective (transparent fund management, for collectives).
+# open_collective: YOUR_OPENCOLLECTIVE_HANDLE
+
+# Tidelift (commercial open source support — for serious projects).
+# tidelift: npm/PACKAGE-NAME
+
+# Custom URLs (up to 4 — paste full https:// URLs in quotes).
+# Use this for: PayPal.me, Stripe Payment Links, your own donation page, etc.
+# custom: ["https://www.paypal.me/YOUR_HANDLE", "https://buy.stripe.com/YOUR_LINK"]
