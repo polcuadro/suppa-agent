@@ -1,20 +1,28 @@
 <p align="center">
-  <img src="docs/images/suppa-agent-hero.png" alt="suppa-agent mascot" height="140">
-  &nbsp;&nbsp;&nbsp;
-  <img src="docs/images/suppa-agent-wordmark.svg" alt="suppa-agent" height="100">
+  <img src="docs/images/suppa-agent-mascot-v8.png" alt="suppa-agent mascot" height="180">
 </p>
 
-> **Build your own private AI app in 30 minutes. Zero cost. Zero coding.**
+<h1 align="center">
+  <img src="docs/images/suppa-agent-wordmark.svg" alt="suppa-agent" height="80">
+</h1>
+
+<p align="center">
+  <b>Build your own private AI app in 30 minutes. Zero cost. Zero coding.</b>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/cost-%240%2Fyear-brightgreen" alt="cost">
+  <img src="https://img.shields.io/badge/context-1M%20tokens-blue" alt="context">
+  <img src="https://img.shields.io/badge/stack-Firebase%20%2B%20Gemini%20%2B%20React-orange" alt="stack">
+  <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="license">
+  <img src="https://img.shields.io/badge/built%20with-Claude-purple" alt="built with">
+</p>
+
+---
 
 suppa-agent turns a free Claude conversation into a fully deployed AI chat app — running on your Firebase, accessible only to people you invite, powered by Gemini's 1-million-token context window.
 
 No subscriptions. No shared servers. No data leaving your account. Just your app, your database, your rules.
-
-[![Cost](https://img.shields.io/badge/cost-%240%2Fyear-brightgreen)]()
-[![Context](https://img.shields.io/badge/context-1M%20tokens-blue)]()
-[![Stack](https://img.shields.io/badge/stack-Firebase%20%2B%20Gemini%20%2B%20React-orange)]()
-[![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
-[![Built with](https://img.shields.io/badge/built%20with-Claude-purple)]()
 
 ---
 
