@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="docs/images/suppa-agent-hero.png" alt="suppa-agent" width="280">
+  <img src="docs/images/suppa-agent-hero.png" alt="suppa-agent mascot" height="140">
+  &nbsp;&nbsp;&nbsp;
+  <img src="docs/images/suppa-agent-wordmark.svg" alt="suppa-agent" height="100">
 </p>
-
-# suppa-agent
 
 > **Build your own private AI app in 30 minutes. Zero cost. Zero coding.**
 

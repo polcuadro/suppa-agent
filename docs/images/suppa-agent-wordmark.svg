@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="100" viewBox="0 0 420 100">
+<rect x="0" y="0" width="420" height="100" rx="12" fill="#0a0f1c"/>
+<text x="210" y="58" text-anchor="middle" font-family="'SF Mono','Fira Code','JetBrains Mono','Courier New',monospace" font-size="42" fill="#e4e8f1" font-weight="700" letter-spacing="-1.5">suppa-agent</text>
+<rect x="0" y="0" width="420" height="100" rx="12" fill="none" stroke="#1e2a42" stroke-width="1"/>
+</svg>
