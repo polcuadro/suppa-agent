@@ -7,7 +7,7 @@
 A private AI chat app deployed on Firebase with:
 - Google login (whitelist-only access)
 - Persistent chat with Gemini 2.5 Flash (1M token context, free tier)
-- Brain panel: manage users + 42-language i18n + context viewer with token usage bar
+- Brain panel: manage users + 12-language i18n + context viewer with token usage bar
 - Mobile responsive sidebar
 - Retry with exponential backoff + fallback to gemini-2.0-flash on 503/429
 - $0/year cost for personal use
@@ -16,7 +16,7 @@ A private AI chat app deployed on Firebase with:
 
 - **gemini-2.5-flash is the default model** — Flash is free tier. Pro requires paid billing. The pitch is $0/year.
 - **Brain panel** replaces "Manage Users": 3 tabs (Users, Language, Context). Context shows all chat history as editable text with token usage bar (% of 1M window).
-- **42-language i18n** — auto-detects browser language, stored in localStorage.
+- **12-language i18n** — auto-detects browser language, stored in localStorage.
 - **Mobile responsive** — sidebar collapses to hamburger on screens < 768px.
 - **Retry + fallback** — 3 retries with 2s/5s/8s delays for 503/429 errors, then falls back to gemini-2.0-flash.
 - **saveBrainContext** Cloud Function — admin-only, saves system instruction to Firestore.
@@ -76,7 +76,7 @@ When the user sends the JSON from Step 11, Claude generates ALL project files as
 │   │   │   └── useAuth.js        # Google login + authorization check
 │   │   ├── services/
 │   │   │   └── firebase.js       # Firebase config (real values from JSON)
-│   │   ├── i18n.js               # 42 languages, 30 keys each
+│   │   ├── i18n.js               # 12 languages, 30 keys each
 │   │   ├── App.jsx               # Root: login/chat/brain routing, mobile responsive
 │   │   ├── constants.js          # VER, APP_NAME
 │   │   ├── main.jsx
@@ -104,7 +104,7 @@ When the user sends the JSON from Step 11, Claude generates ALL project files as
 
 **BrainPanel.jsx must include:**
 - Tab "Users": add/remove authorized users (same as old AdminPanel)
-- Tab "Language": grid of 42 languages, click to switch, stored in localStorage
+- Tab "Language": grid of 12 languages, click to switch, stored in localStorage
 - Tab "Context": loads ALL messages from ALL user's chats into an editable textarea. Shows token usage bar (% of 1M). User can delete old text and save to reduce context. Calls `saveBrainContext` to persist.
 
 **App.jsx must include:**
@@ -115,7 +115,7 @@ When the user sends the JSON from Step 11, Claude generates ALL project files as
 - Button label: "Brain" (no emoji)
 
 **i18n.js must include:**
-- 42 languages: ar, bg, bn, ca, cs, da, de, el, en, es, et, fa, fi, fr, hi, hr, hu, id, it, ja, ko, lt, lv, ms, nl, no, pl, pt, ro, ru, sa, sk, sl, sv, sw, th, tl, tr, uk, ur, vi, zh
+- 12 languages: ca, de, en, es, fr, it, ja, ko, nl, pt, ru, zh
 - Keys: loading, loginGoogle, notAuth, notOnList, logout, newChat, selectChat, startMsg, typePlaceholder, send, brain, users, language, add, remove, user, admin, validEmail, exists, noSelfRemove, dismiss, tagline, context, contextWindow, save, clear, saved, noData
 - Auto-detect browser language, fallback to English
 - Persist in localStorage as `sa-lang`
