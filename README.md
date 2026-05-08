@@ -24,17 +24,15 @@ No subscriptions. No shared servers. No data leaving your account. Just your app
 
 ## How it works
 
-1. Go to [claude.ai](https://claude.ai) — the **free tier** is enough
-2. Upload two files from this repo: **`WIZARD.md`** + **`MANUAL.pdf`**
-3. Type: **"generate the wizard"**
-4. Follow the interactive wizard (11 steps, ~25 minutes)
-5. Claude generates your entire project — download it
+1. Go to [**polcuadro.github.io/suppa-agent**](https://polcuadro.github.io/suppa-agent) — the wizard runs in your browser, no Claude needed for this step
+2. Follow the 11-step wizard (~25 minutes) — it speaks 12 languages and auto-detects yours
+3. At Step 11, copy the config JSON
+4. Open [claude.ai](https://claude.ai) (free tier works) and paste the JSON with **"generate all project files"**
+5. Download the zip Claude generates
 6. Run 5 commands in your terminal
 7. Done. Your app is live at `https://your-app.web.app`
 
 No Claude Code. No paid Claude plan. No prior Firebase experience.
-
-The wizard speaks 12 languages and auto-detects yours.
 
 ---
 
