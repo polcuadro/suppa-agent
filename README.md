@@ -24,15 +24,13 @@ No subscriptions. No shared servers. No data leaving your account. Just your app
 
 ## How it works
 
-1. Go to [**polcuadro.github.io/suppa-agent**](https://polcuadro.github.io/suppa-agent) — the wizard runs in your browser, no Claude needed for this step
-2. Follow the 11-step wizard (~25 minutes) — it speaks 12 languages and auto-detects yours
-3. At Step 11, copy the config JSON
-4. Open [claude.ai](https://claude.ai) (free tier works) and paste the JSON with **"generate all project files"**
-5. Download the zip Claude generates
-6. Run 5 commands in your terminal
-7. Done. Your app is live at `https://your-app.web.app`
+1. Go to [**polcuadro.github.io/suppa-agent**](https://polcuadro.github.io/suppa-agent) — fill in 4 fields (name, slug, email, API key)
+2. Copy the generated commands to Claude Code
+3. Claude Code sets up Firebase, generates all files, and deploys automatically
+4. Do 2 manual steps in Firebase Console when Code tells you (Blaze upgrade + enable Google Auth)
+5. Done. Your app is live at `https://your-app.web.app`
 
-No Claude Code. No paid Claude plan. No prior Firebase experience.
+Claude Code does the heavy lifting — ~20 minutes from start to deployed app.
 
 ---
 
@@ -92,10 +90,10 @@ We set up a $5/month spending alert during the wizard so there are no surprises.
 
 ## Requirements
 
+- Claude Pro with Claude Code
 - A Google account
-- Node.js 22+
-- A terminal (or Claude Code, if you have it)
-- 30 minutes
+- A credit card for Firebase Blaze ($0 cost)
+- 20 minutes
 
 ---
 
