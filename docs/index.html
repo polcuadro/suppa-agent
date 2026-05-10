@@ -82,8 +82,10 @@ FEATURES:
 - React + Vite frontend, dark theme (#0a0f1c), DM Sans font
 - Mobile responsive sidebar (hamburger menu on <768px)  
 - Google login with whitelist (authorizedUsers collection in Firestore)
-- Chat with Gemini 2.5 Flash, message ordering by seq field, persistent history
-- Retry with exponential backoff (3 attempts: 2s/5s/8s delays) for 503/429/overloaded errors, then fallback to gemini-2.0-flash
+- Chat with Gemini 2.5 Flash, message ordering by seq field (integer, not timestamp), persistent history
+- Chat history cleanup before sending to Gemini: strip leading 'model' messages, merge consecutive same-role messages
+- Retry with exponential backoff (3 attempts: 2s/5s/8s delays) for errors containing: 503, 429, Service Unavailable, overloaded, high demand, RESOURCE_EXHAUSTED. After 3 failures, fallback to gemini-2.0-flash
+- After each successful Gemini response, save token usage to brain/usage document: tokensIn, tokensOut, tokensTotal, maxTokens (1048576), percentage
 - BrainPanel modal with 3 tabs: Users (add/remove authorized users), Language (12 langs: ca,de,en,es,fr,it,ja,ko,nl,pt,ru,zh), Context (loads all chat messages into editable textarea, shows token usage bar as % of 1M tokens, save/clear buttons calling saveBrainContext)
 - saveBrainContext Cloud Function (admin-only, saves to brain/context in Firestore)
 - brain/context document used as systemInstruction in Gemini calls
@@ -93,6 +95,7 @@ FEATURES:
 - All Cloud Functions: firebase-functions/v2 onCall, region europe-west1, Node 22
 - functions: chatWithGemini, saveBrainContext, healthCheck
 - CLAUDE.md with post-deploy checklist
+- Vite config: outDir must be '../dist/web'. firebase.json hosting public must be 'dist/web'. These MUST match or the app shows a blank page.
 
 Use the REAL firebaseConfig values from the previous step. Zero placeholders.
 Button label for admin panel: "Brain" (no emoji).`;
