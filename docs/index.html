@@ -4,197 +4,282 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>suppa-agent — setup wizard</title>
-<meta name="description" content="Build your own private AI app. Claude Code does the heavy lifting.">
 <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#09090b;color:#e4e8f1;font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
+.phase{background:#18181b;border:1px solid #27272a;border-radius:12px;padding:20px;margin-bottom:12px}
+.phase-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.badge{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase}
+.badge-terminal{background:#1e3a5f;color:#60a5fa}
+.badge-manual{background:#422006;color:#f59e0b}
+.cmd{background:#09090b;border:1px solid #27272a;border-radius:8px;padding:12px;font-family:monospace;font-size:13px;color:#a1a1aa;margin:8px 0;cursor:pointer;position:relative;word-break:break-all}
+.cmd:hover{border-color:#3b82f6}
+.cmd::after{content:'📋';position:absolute;right:8px;top:8px;font-size:14px}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.step-code{background:#1e3a5f;color:#60a5fa}
+.step-manual{background:#422006;color:#f59e0b}
+.note{font-size:12px;color:#f59e0b;margin-top:8px;line-height:1.5}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState, useCallback} = React;
+const {useState} = React;
 
-const LANGS={en:"English",es:"Español",ca:"Català",fr:"Français",de:"Deutsch",it:"Italiano",pt:"Português",ja:"日本語",ko:"한국어",zh:"中文"};
-const T={
-en:{s1t:"Build your private AI app",s1d:"In about 20 minutes, you'll have your own AI chat app running on Firebase, accessible only to people you invite.",s1r:"What you need:",s1i:["Claude Pro with Claude Code","A Google account (Gmail)","A credit card (for Firebase Blaze — stays at $0)"],s1b:"Let's go →",
-s2t:"Your app info",s2name:"App name",s2namep:"My Assistant",s2slug:"Project ID (slug)",s2slugp:"my-assistant",s2email:"Owner Gmail",s2emailp:"you@gmail.com",s2key:"Gemini API key",s2keyp:"AIza...",s2keylink:"Get your free key at Google AI Studio →",s2warn:"⚠️ The slug becomes the Firebase Project ID. Cannot change later.",s2b:"Generate setup commands →",
-s3t:"Send this to Claude Code",s3d:"Copy this entire block and paste it into Claude Code. It will set up everything automatically.",s3copy:"📋 Copy to clipboard",s3copied:"✅ Copied!",s3manual:"After Code finishes, it will tell you 2 things to do manually in Firebase Console (Blaze upgrade + enable Google Auth). Everything else is automated.",
-s4t:"After deploy",s4d:"Once Claude Code finishes deploying, do these final steps:",s4steps:["Open your app URL → you'll see a Firestore index error → click the link → create index → wait 2 min","Go to Google Cloud Console → Cloud Run → for each service (chatWithGemini, healthCheck, saveBrainContext) → Security → add allUsers as Cloud Run Invoker","Firebase Console → Firestore → collection authorizedUsers → add document with ID = your email → field role = admin","Reload app → login → send a test message → open Brain → verify Context tab shows tokens"],s4done:"🎉 Your app is live!"},
-es:{s1t:"Construye tu app de IA privada",s1d:"En unos 20 minutos, tendrás tu propia app de chat IA en Firebase, accesible solo para quien tú invites.",s1r:"Lo que necesitas:",s1i:["Claude Pro con Claude Code","Una cuenta de Google (Gmail)","Una tarjeta de crédito (para Firebase Blaze — coste $0)"],s1b:"Empezar →",
-s2t:"Datos de tu app",s2name:"Nombre de la app",s2namep:"Mi Asistente",s2slug:"ID del proyecto (slug)",s2slugp:"mi-asistente",s2email:"Gmail del propietario",s2emailp:"tu@gmail.com",s2key:"Clave API de Gemini",s2keyp:"AIza...",s2keylink:"Obtén tu clave gratis en Google AI Studio →",s2warn:"⚠️ El slug será el ID del proyecto Firebase. No se puede cambiar después.",s2b:"Generar comandos →",
-s3t:"Envía esto a Claude Code",s3d:"Copia este bloque entero y pégalo en Claude Code. Configurará todo automáticamente.",s3copy:"📋 Copiar al portapapeles",s3copied:"✅ ¡Copiado!",s3manual:"Cuando Code termine, te dirá 2 cosas que hacer manualmente en Firebase Console (Blaze y Google Auth). Todo lo demás es automático.",
-s4t:"Después del deploy",s4d:"Cuando Claude Code termine de desplegar, haz estos pasos finales:",s4steps:["Abre la URL de tu app → verás un error de índice Firestore → haz clic en el enlace → crear índice → espera 2 min","Ve a Google Cloud Console → Cloud Run → para cada servicio (chatWithGemini, healthCheck, saveBrainContext) → Security → añade allUsers como Cloud Run Invoker","Firebase Console → Firestore → colección authorizedUsers → añade documento con ID = tu email → campo role = admin","Recarga la app → login → envía un mensaje de prueba → abre Brain → verifica que el tab Context muestra tokens"],s4done:"🎉 ¡Tu app está en marcha!"},
-ca:{s1t:"Construeix la teva app d'IA privada",s1d:"En uns 20 minuts, tindràs la teva pròpia app de xat IA a Firebase, accessible només per a qui tu convidis.",s1r:"Què necessites:",s1i:["Claude Pro amb Claude Code","Un compte de Google (Gmail)","Una targeta de crèdit (per Firebase Blaze — cost $0)"],s1b:"Comencem →",
-s2t:"Dades de la teva app",s2name:"Nom de l'app",s2namep:"El Meu Assistent",s2slug:"ID del projecte (slug)",s2slugp:"el-meu-assistent",s2email:"Gmail del propietari",s2emailp:"tu@gmail.com",s2key:"Clau API de Gemini",s2keyp:"AIza...",s2keylink:"Obtén la teva clau gratis a Google AI Studio →",s2warn:"⚠️ El slug serà l'ID del projecte Firebase. No es pot canviar després.",s2b:"Generar comandes →",
-s3t:"Envia això a Claude Code",s3d:"Copia tot aquest bloc i enganxa'l a Claude Code. Configurarà tot automàticament.",s3copy:"📋 Copiar al portapapers",s3copied:"✅ Copiat!",s3manual:"Quan Code acabi, et dirà 2 coses a fer manualment a Firebase Console (Blaze i Google Auth). Tot lo demés és automàtic.",
-s4t:"Després del deploy",s4d:"Quan Claude Code acabi de desplegar, fes aquests passos finals:",s4steps:["Obre la URL de la teva app → veuràs un error d'índex Firestore → clica l'enllaç → crear índex → espera 2 min","Ves a Google Cloud Console → Cloud Run → per cada servei (chatWithGemini, healthCheck, saveBrainContext) → Security → afegeix allUsers com Cloud Run Invoker","Firebase Console → Firestore → col·lecció authorizedUsers → afegeix document amb ID = el teu email → camp role = admin","Recarga l'app → login → envia un missatge de prova → obre Brain → verifica que el tab Context mostra tokens"],s4done:"🎉 La teva app està en marxa!"}
-};
+function copyText(text) {
+  try { navigator.clipboard.writeText(text) } catch {
+    const ta = document.createElement('textarea'); ta.value = text;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+}
 
-function detectLang(){const n=(navigator.language||"en").split("-")[0].toLowerCase();return T[n]?n:"en"}
+function Cmd({text, multiline}) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => { copyText(text); setCopied(true); setTimeout(() => setCopied(false), 2000) };
+  return <div className="cmd" onClick={copy} style={multiline ? {whiteSpace:'pre-wrap',fontSize:12} : {}}>
+    {copied ? '✅ Copied!' : text}
+  </div>;
+}
 
-function Wizard(){
-  const[lang,setLang]=useState(detectLang);
-  const[step,setStep]=useState(1);
-  const[name,setName]=useState("");
-  const[slug,setSlug]=useState("");
-  const[email,setEmail]=useState("");
-  const[key,setKey]=useState("");
-  const[copied,setCopied]=useState(false);
-  const t=k=>T[lang]?.[k]||T.en[k]||k;
+function Wizard() {
+  const [step, setStep] = useState(0);
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [email, setEmail] = useState('');
+  const [apiKey, setApiKey] = useState('');
 
-  const autoSlug=v=>{setName(v);if(!slug||slug===toSlug(name))setSlug(toSlug(v))};
-  const toSlug=s=>s.toLowerCase().replace(/[^a-z0-9-]/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"").slice(0,30);
+  const toSlug = s => s.toLowerCase().replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'').slice(0,30);
+  const autoSlug = v => { setName(v); if (!slug || slug === toSlug(name)) setSlug(toSlug(v)) };
+  const valid = name.length >= 2 && slug.length >= 4 && email.includes('@') && apiKey.startsWith('AIza') && apiKey.length >= 30;
 
-  const valid=name.length>=2&&slug.length>=4&&email.includes("@")&&email.includes(".")&&key.startsWith("AIza")&&key.length>=30;
+  const input = {width:'100%',padding:'10px 14px',background:'#1c1c21',color:'#e4e8f1',border:'1px solid #27272a',borderRadius:8,fontSize:14,outline:'none',marginTop:4};
+  const label = {fontSize:13,color:'#a1a1aa',display:'block',marginTop:14};
+  const btn = (active) => ({padding:'12px 28px',background:active?'#3b82f6':'#27272a',color:active?'#fff':'#52525b',border:'none',borderRadius:10,fontSize:15,fontWeight:600,cursor:active?'pointer':'default',width:'100%',marginTop:20});
 
-  const codePrompt=`Set up a new suppa-agent project called "${name}" (slug: ${slug}).
+  const codePrompt1 = `firebase projects:create ${slug} --display-name "${name}"
+firebase projects:addfirebase ${slug}`;
 
+  const codePrompt2 = `gcloud firestore databases create --project=${slug} --location=eur3 --type=firestore-native
+gcloud services enable secretmanager.googleapis.com --project=${slug}
+firebase apps:create web "${name}" --project=${slug}
+firebase apps:sdkconfig web --project=${slug}`;
+
+  const codePrompt3 = `firebase use ${slug}
+firebase functions:secrets:set GEMINI_API_KEY --project=${slug}`;
+
+  const codePromptGenerate = `Generate ALL project files for a suppa-agent app in folder ${slug}/ with these specs:
+
+PROJECT: ${name} (slug: ${slug})
 OWNER: ${email}
-GEMINI API KEY: ${key}
 MODEL: gemini-2.5-flash
 REGION: europe-west1
-FIRESTORE LOCATION: eur3
 
-DO THESE STEPS IN ORDER:
+FEATURES:
+- React + Vite frontend, dark theme (#0a0f1c), DM Sans font
+- Mobile responsive sidebar (hamburger menu on <768px)  
+- Google login with whitelist (authorizedUsers collection in Firestore)
+- Chat with Gemini 2.5 Flash, message ordering by seq field, persistent history
+- Retry with exponential backoff (3 attempts: 2s/5s/8s delays) for 503/429/overloaded errors, then fallback to gemini-2.0-flash
+- BrainPanel modal with 3 tabs: Users (add/remove authorized users), Language (12 langs: ca,de,en,es,fr,it,ja,ko,nl,pt,ru,zh), Context (loads all chat messages into editable textarea, shows token usage bar as % of 1M tokens, save/clear buttons calling saveBrainContext)
+- saveBrainContext Cloud Function (admin-only, saves to brain/context in Firestore)
+- brain/context document used as systemInstruction in Gemini calls
+- i18n.js with 12 languages, auto-detect browser lang, persist in localStorage
+- Firestore security rules for: chats (owner), messages (parent owner), authorizedUsers (read: auth, write: admin), brain (read: auth, write: admin), users (own uid)
+- firestore.indexes.json with composite index: chats (ownerId ASC + updatedAt DESC)
+- All Cloud Functions: firebase-functions/v2 onCall, region europe-west1, Node 22
+- functions: chatWithGemini, saveBrainContext, healthCheck
+- CLAUDE.md with post-deploy checklist
 
-1. firebase login (if not already logged in — must use ${email})
-2. firebase projects:create ${slug} --display-name "${name}"
-3. firebase projects:addfirebase ${slug}
+Use the REAL firebaseConfig values from the previous step. Zero placeholders.
+Button label for admin panel: "Brain" (no emoji).`;
 
-PAUSE HERE and tell me to do these 2 things manually in Firebase Console:
-a) Go to https://console.firebase.google.com/project/${slug}/usage/details and upgrade to Blaze plan (enter credit card, stays at $0)
-b) Go to https://console.firebase.google.com/project/${slug}/authentication/providers → enable Google → set support email to ${email} → Save
+  const codePromptDeploy = `cd ${slug}/web && npm install
+cd ../functions && npm install
+cd .. && firebase deploy --project=${slug}`;
 
-When I confirm both are done, continue:
+  const codePromptPostDeploy = `Add allUsers as Cloud Run Invoker role to these 3 Cloud Run services in project ${slug}: chatWithGemini, healthCheck, saveBrainContext. Use gcloud commands:
+gcloud run services add-iam-policy-binding chatWithGemini --region=europe-west1 --member=allUsers --role=roles/run.invoker --project=${slug}
+gcloud run services add-iam-policy-binding healthCheck --region=europe-west1 --member=allUsers --role=roles/run.invoker --project=${slug}
+gcloud run services add-iam-policy-binding saveBrainContext --region=europe-west1 --member=allUsers --role=roles/run.invoker --project=${slug}
 
-4. Create Firestore: gcloud firestore databases create --project=${slug} --location=eur3 --type=firestore-native
-5. Enable Secret Manager API: gcloud services enable secretmanager.googleapis.com --project=${slug}
-6. Create web app: firebase apps:create web "${name}" --project=${slug}
-7. Get firebase config: firebase apps:sdkconfig web --project=${slug} (save the config values)
-8. firebase use --add → select ${slug} → alias default
-9. firebase functions:secrets:set GEMINI_API_KEY --project=${slug} (paste: ${key})
+Then create the first admin user in Firestore:
+Use firebase admin or gcloud to add a document to collection authorizedUsers with document ID "${email}" and field role="admin" in project ${slug}.`;
 
-10. Generate ALL project files for ${slug}/ with these features:
-- React + Vite frontend, dark theme, DM Sans font
-- Mobile responsive sidebar (hamburger on <768px)
-- Google login with whitelist (authorizedUsers collection)
-- Chat with Gemini 2.5 Flash, seq ordering, persistent history
-- Retry with exponential backoff (3 attempts, 2s/5s/8s) for 503/429 errors, fallback to gemini-2.0-flash
-- BrainPanel with 3 tabs: Users (add/remove), Language (12 langs: ca,de,en,es,fr,it,ja,ko,nl,pt,ru,zh), Context (editable context viewer with token % bar)
-- saveBrainContext Cloud Function (admin-only)
-- brain/context as systemInstruction in Gemini calls
-- i18n with 12 languages, auto-detect browser language, localStorage persistence
-- Firestore rules for chats, messages, authorizedUsers, brain, users
-- Composite index: chats (ownerId ASC + updatedAt DESC)
-- All Cloud Functions use firebase-functions/v2 onCall, region europe-west1, Node 22
-- CLAUDE.md with post-deploy steps
-
-Use the REAL firebase config from step 7. Zero placeholders.
-
-11. cd ${slug}/web && npm install
-12. cd ../functions && npm install  
-13. cd .. && firebase deploy --project=${slug}
-
-After deploy, tell me to do the post-deploy steps from CLAUDE.md.`;
-
-  const copyPrompt=async()=>{
-    try{await navigator.clipboard.writeText(codePrompt);setCopied(true);setTimeout(()=>setCopied(false),3000)}
-    catch{const ta=document.createElement("textarea");ta.value=codePrompt;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);setCopied(true);setTimeout(()=>setCopied(false),3000)}
-  };
-
-  const box={background:"#18181b",border:"1px solid #27272a",borderRadius:12,padding:24};
-  const input={width:"100%",padding:"10px 14px",background:"#1c1c21",color:"#e4e8f1",border:"1px solid #27272a",borderRadius:8,fontSize:14,outline:"none",marginTop:4};
-  const label={fontSize:13,color:"#a1a1aa",display:"block",marginTop:16};
-  const btn=(active)=>({padding:"12px 28px",background:active?"#3b82f6":"#27272a",color:active?"#fff":"#52525b",border:"none",borderRadius:10,fontSize:15,fontWeight:600,cursor:active?"pointer":"default",width:"100%",marginTop:20});
-
-  return(
-    <div style={{maxWidth:580,margin:"0 auto",padding:"32px 20px"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
-        <div style={{fontSize:12,color:"#52525b"}}>STEP {step} OF 4</div>
-        <select value={lang} onChange={e=>setLang(e.target.value)} style={{background:"#18181b",color:"#a1a1aa",border:"1px solid #27272a",borderRadius:6,padding:"4px 8px",fontSize:12}}>
-          {Object.entries(LANGS).map(([k,v])=><option key={k} value={k}>{v}</option>)}
-        </select>
+  return (
+    <div style={{maxWidth:620,margin:'0 auto',padding:'32px 20px'}}>
+      <div style={{textAlign:'center',marginBottom:32}}>
+        <h1 style={{fontSize:28,fontWeight:700}}>suppa-agent</h1>
+        <p style={{color:'#52525b',fontSize:13,marginTop:4}}>Private AI app wizard · Code-first setup</p>
       </div>
 
-      {step===1&&(
-        <div style={box}>
-          <h1 style={{fontSize:28,fontWeight:700,marginBottom:12}}>{t("s1t")}</h1>
-          <p style={{color:"#a1a1aa",fontSize:15,lineHeight:1.6,marginBottom:20}}>{t("s1d")}</p>
-          <p style={{fontSize:14,fontWeight:600,marginBottom:8}}>{t("s1r")}</p>
-          <ul style={{listStyle:"none",padding:0}}>
-            {t("s1i").map((item,i)=><li key={i} style={{padding:"6px 0",color:"#d4d4d8",fontSize:14,borderBottom:"1px solid #1c1c21"}}>→ {item}</li>)}
-          </ul>
-          <button onClick={()=>setStep(2)} style={btn(true)}>{t("s1b")}</button>
+      {step === 0 && (
+        <div className="phase">
+          <h2 style={{fontSize:22,marginBottom:12}}>Build your private AI app</h2>
+          <p style={{color:'#a1a1aa',lineHeight:1.6,marginBottom:16}}>In ~20 minutes you'll have your own AI chat app on Firebase. Claude Code does almost everything — you only touch Firebase Console twice.</p>
+          <p style={{fontSize:14,fontWeight:600,marginBottom:8}}>You need:</p>
+          <div style={{color:'#d4d4d8',fontSize:14}}>
+            <div style={{padding:'6px 0'}}>→ Claude Pro with Claude Code</div>
+            <div style={{padding:'6px 0'}}>→ A Google account (Gmail)</div>
+            <div style={{padding:'6px 0'}}>→ A credit card (Firebase Blaze — stays at $0)</div>
+            <div style={{padding:'6px 0'}}>→ <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style={{color:'#3b82f6'}}>A free Gemini API key (get it here) →</a></div>
+          </div>
+          <button onClick={() => setStep(1)} style={btn(true)}>Start →</button>
         </div>
       )}
 
-      {step===2&&(
-        <div style={box}>
-          <h1 style={{fontSize:24,fontWeight:700,marginBottom:8}}>{t("s2t")}</h1>
-          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style={{color:"#3b82f6",fontSize:13,textDecoration:"underline"}}>{t("s2keylink")}</a>
-
-          <label style={label}>{t("s2name")}</label>
-          <input value={name} onChange={e=>autoSlug(e.target.value)} placeholder={t("s2namep")} style={input}/>
-
-          <label style={label}>{t("s2slug")}</label>
-          <input value={slug} onChange={e=>setSlug(toSlug(e.target.value))} placeholder={t("s2slugp")} style={input}/>
-          {slug&&<div style={{fontSize:11,color:"#f59e0b",marginTop:4}}>{t("s2warn")}</div>}
-
-          <label style={label}>{t("s2email")}</label>
-          <input value={email} onChange={e=>setEmail(e.target.value.trim())} placeholder={t("s2emailp")} type="email" style={input}/>
-
-          <label style={label}>{t("s2key")}</label>
-          <input value={key} onChange={e=>setKey(e.target.value.trim())} placeholder={t("s2keyp")} style={input}/>
-
-          <div style={{display:"flex",gap:8,marginTop:20}}>
-            <button onClick={()=>setStep(1)} style={{...btn(true),background:"#27272a",color:"#a1a1aa",flex:"0 0 auto",width:"auto",padding:"12px 20px"}}>←</button>
-            <button onClick={()=>valid&&setStep(3)} style={{...btn(valid),flex:1}}>{t("s2b")}</button>
+      {step === 1 && (
+        <div className="phase">
+          <h2 style={{fontSize:20,marginBottom:4}}>Your app info</h2>
+          <label style={label}>App name</label>
+          <input value={name} onChange={e => autoSlug(e.target.value)} placeholder="My Assistant" style={input}/>
+          <label style={label}>Project ID (slug)</label>
+          <input value={slug} onChange={e => setSlug(toSlug(e.target.value))} placeholder="my-assistant" style={input}/>
+          {slug && <div className="note">⚠️ This becomes your Firebase Project ID and URL. Can't change later.</div>}
+          <label style={label}>Owner Gmail</label>
+          <input value={email} onChange={e => setEmail(e.target.value.trim())} placeholder="you@gmail.com" type="email" style={input}/>
+          <label style={label}>Gemini API key</label>
+          <input value={apiKey} onChange={e => setApiKey(e.target.value.trim())} placeholder="AIza..." style={input}/>
+          <div style={{display:'flex',gap:8,marginTop:20}}>
+            <button onClick={() => setStep(0)} style={{...btn(true),background:'#27272a',color:'#a1a1aa',width:'auto',padding:'12px 20px'}}>←</button>
+            <button onClick={() => valid && setStep(2)} style={{...btn(valid),flex:1}}>Generate steps →</button>
           </div>
         </div>
       )}
 
-      {step===3&&(
-        <div style={box}>
-          <h1 style={{fontSize:24,fontWeight:700,marginBottom:8}}>{t("s3t")}</h1>
-          <p style={{color:"#a1a1aa",fontSize:14,marginBottom:12}}>{t("s3d")}</p>
-          
-          <button onClick={copyPrompt} style={{...btn(true),marginTop:0,marginBottom:12}}>
-            {copied?t("s3copied"):t("s3copy")}
-          </button>
-
-          <textarea readOnly value={codePrompt} onClick={e=>e.target.select()} style={{width:"100%",minHeight:300,padding:12,background:"#09090b",color:"#a1a1aa",border:"1px solid #27272a",borderRadius:8,fontSize:12,fontFamily:"monospace",lineHeight:1.5,resize:"vertical",boxSizing:"border-box"}}/>
-
-          <p style={{color:"#f59e0b",fontSize:13,marginTop:12,lineHeight:1.5}}>{t("s3manual")}</p>
-
-          <div style={{display:"flex",gap:8,marginTop:20}}>
-            <button onClick={()=>setStep(2)} style={{...btn(true),background:"#27272a",color:"#a1a1aa",flex:"0 0 auto",width:"auto",padding:"12px 20px"}}>←</button>
-            <button onClick={()=>setStep(4)} style={{...btn(true),flex:1}}>Post-deploy steps →</button>
+      {step >= 2 && (
+        <div>
+          <div style={{fontSize:12,color:'#52525b',marginBottom:16,textAlign:'center'}}>
+            {name} · {slug}.web.app · {email}
           </div>
+
+          {/* PHASE 0: Manual login */}
+          <div className="phase">
+            <div className="phase-header">
+              <div className="step-num step-manual">0</div>
+              <div><strong>Login to Firebase</strong> <span className="badge badge-manual">YOU</span></div>
+            </div>
+            <p style={{color:'#a1a1aa',fontSize:13,marginBottom:8}}>Open PowerShell (not Code) and run:</p>
+            <Cmd text="npx firebase login --reauth"/>
+            <p style={{color:'#a1a1aa',fontSize:12}}>Login with <strong>{email}</strong> in the browser. Then come back here.</p>
+          </div>
+
+          {/* PHASE 1: Create project */}
+          <div className="phase">
+            <div className="phase-header">
+              <div className="step-num step-code">1</div>
+              <div><strong>Create Firebase project</strong> <span className="badge badge-terminal">CODE</span></div>
+            </div>
+            <p style={{color:'#a1a1aa',fontSize:13,marginBottom:8}}>Copy and paste into Claude Code:</p>
+            <Cmd text={codePrompt1} multiline/>
+          </div>
+
+          {/* PHASE 2: Manual Blaze + Auth */}
+          <div className="phase">
+            <div className="phase-header">
+              <div className="step-num step-manual">2</div>
+              <div><strong>Blaze + Google Auth</strong> <span className="badge badge-manual">YOU</span></div>
+            </div>
+            <p style={{color:'#a1a1aa',fontSize:13,marginBottom:8}}>Open these 2 links and do what they say:</p>
+            <div style={{fontSize:13,marginBottom:6}}>
+              <a href={`https://console.firebase.google.com/project/${slug}/usage/details`} target="_blank" rel="noreferrer" style={{color:'#3b82f6'}}>
+                a) Upgrade to Blaze plan →
+              </a>
+              <span style={{color:'#71717a',fontSize:12}}> (enter card, stays at $0)</span>
+            </div>
+            <div style={{fontSize:13}}>
+              <a href={`https://console.firebase.google.com/project/${slug}/authentication/providers`} target="_blank" rel="noreferrer" style={{color:'#3b82f6'}}>
+                b) Enable Google Auth →
+              </a>
+              <span style={{color:'#71717a',fontSize:12}}> (enable Google, set email to {email}, Save)</span>
+            </div>
+          </div>
+
+          {/* PHASE 3: Setup services */}
+          <div className="phase">
+            <div className="phase-header">
+              <div className="step-num step-code">3</div>
+              <div><strong>Setup services + get config</strong> <span className="badge badge-terminal">CODE</span></div>
+            </div>
+            <p style={{color:'#a1a1aa',fontSize:13,marginBottom:8}}>Copy and paste into Claude Code:</p>
+            <Cmd text={codePrompt2} multiline/>
+            <div className="note">Code will show you the firebaseConfig values. They'll be used in the next step.</div>
+          </div>
+
+          {/* PHASE 4: Secrets */}
+          <div className="phase">
+            <div className="phase-header">
+              <div className="step-num step-code">4</div>
+              <div><strong>Link project + save API key</strong> <span className="badge badge-terminal">CODE</span></div>
+            </div>
+            <Cmd text={codePrompt3} multiline/>
+            <div className="note">When asked for the secret value, paste: {apiKey}</div>
+          </div>
+
+          {/* PHASE 5: Generate files */}
+          <div className="phase">
+            <div className="phase-header">
+              <div className="step-num step-code">5</div>
+              <div><strong>Generate all project files</strong> <span className="badge badge-terminal">CODE</span></div>
+            </div>
+            <p style={{color:'#a1a1aa',fontSize:13,marginBottom:8}}>This is the big one — Code generates the entire app:</p>
+            <Cmd text={codePromptGenerate} multiline/>
+          </div>
+
+          {/* PHASE 6: Deploy */}
+          <div className="phase">
+            <div className="phase-header">
+              <div className="step-num step-code">6</div>
+              <div><strong>Install + deploy</strong> <span className="badge badge-terminal">CODE</span></div>
+            </div>
+            <Cmd text={codePromptDeploy} multiline/>
+          </div>
+
+          {/* PHASE 7: Post-deploy */}
+          <div className="phase">
+            <div className="phase-header">
+              <div className="step-num step-code">7</div>
+              <div><strong>Post-deploy setup</strong> <span className="badge badge-terminal">CODE</span></div>
+            </div>
+            <p style={{color:'#a1a1aa',fontSize:13,marginBottom:8}}>Copy and paste — Code handles Cloud Run permissions + first admin:</p>
+            <Cmd text={codePromptPostDeploy} multiline/>
+          </div>
+
+          {/* PHASE 8: Index */}
+          <div className="phase">
+            <div className="phase-header">
+              <div className="step-num step-manual">8</div>
+              <div><strong>Create Firestore index</strong> <span className="badge badge-manual">YOU</span></div>
+            </div>
+            <p style={{color:'#a1a1aa',fontSize:13}}>
+              Open <a href={`https://${slug}.web.app`} target="_blank" rel="noreferrer" style={{color:'#3b82f6'}}>{slug}.web.app</a> → 
+              you'll see an error with a link → click the link → Create index → wait 2 minutes → reload.
+            </p>
+          </div>
+
+          {/* DONE */}
+          <div className="phase" style={{textAlign:'center',borderColor:'#065f46'}}>
+            <div style={{fontSize:28,marginBottom:8}}>🎉</div>
+            <h2 style={{fontSize:20}}>Your app is live!</h2>
+            <p style={{color:'#a1a1aa',fontSize:14,marginTop:8}}>
+              Open <a href={`https://${slug}.web.app`} target="_blank" rel="noreferrer" style={{color:'#3b82f6'}}>{slug}.web.app</a>, 
+              login with {email}, send a message. Open Brain → Context to see your tokens.
+            </p>
+          </div>
+
+          <button onClick={() => setStep(1)} style={{...btn(true),background:'#27272a',color:'#a1a1aa',marginTop:8}}>← Edit config</button>
         </div>
       )}
 
-      {step===4&&(
-        <div style={box}>
-          <h1 style={{fontSize:24,fontWeight:700,marginBottom:8}}>{t("s4t")}</h1>
-          <p style={{color:"#a1a1aa",fontSize:14,marginBottom:16}}>{t("s4d")}</p>
-          <ol style={{listStyle:"decimal",paddingLeft:20}}>
-            {t("s4steps").map((s,i)=><li key={i} style={{padding:"10px 0",color:"#d4d4d8",fontSize:13,lineHeight:1.6,borderBottom:"1px solid #1c1c21"}}>{s}</li>)}
-          </ol>
-          <div style={{textAlign:"center",marginTop:24,fontSize:22}}>{t("s4done")}</div>
-          <button onClick={()=>setStep(3)} style={{...btn(true),background:"#27272a",color:"#a1a1aa",marginTop:16}}>← Back to commands</button>
-        </div>
-      )}
-
-      <div style={{textAlign:"center",marginTop:32,fontSize:11,color:"#27272a"}}>suppa-agent v0.001 · by polcuadro</div>
+      <div style={{textAlign:'center',marginTop:32,fontSize:11,color:'#27272a'}}>suppa-agent v0.002 · by polcuadro</div>
     </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(Wizard));
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(Wizard));
 </script>
 </body>
 </html>
